@@ -1,0 +1,236 @@
+// 祈滕網站 Prisma Schema
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AdminRole {
+  SUPERADMIN
+  EDITOR
+  VIEWER
+}
+
+// =====================
+// 管理員帳號
+// =====================
+model AdminUser {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String // bcrypt hashed
+  name      String
+  role      AdminRole @default(SUPERADMIN)
+  isActive  Boolean   @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+// =====================
+// 聯絡表單送出記錄
+// =====================
+model ContactSubmission {
+  id              Int      @id @default(autoincrement())
+  name            String
+  phone           String?
+  lineId          String?
+  email           String?
+  category        String // 課程諮詢 | 裝備採購 | 企業合作 | 其他
+  courseOrProduct String? // 指定課程/產品
+  message         String   @db.Text
+  isRead          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@map("contact_submissions")
+}
+
+// =====================
+// 最新消息
+// =====================
+model NewsPost {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  content     String?  @db.Text
+  imageUrl    String?
+  isPublished Boolean  @default(true)
+  publishedAt DateTime @default(now())
+
+  // SEO 欄位
+  seoTitle       String? @db.VarChar(70)
+  seoDescription String? @db.VarChar(160)
+  imageAlt       String? @db.VarChar(200)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("news_posts")
+}
+
+// =====================
+// 部落格文章
+// =====================
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  category    String // 實戰原則 | KRAV MAGA | 戰術裝備 | 訓練裝備
+  title       String
+  description String   @db.Text
+  content     String?  @db.Text
+  imageUrl    String?
+  readTime    Int      @default(5) // 分鐘
+  isPublished Boolean  @default(true)
+  publishedAt DateTime @default(now())
+
+  // SEO 欄位
+  seoTitle       String? @db.VarChar(70)
+  seoDescription String? @db.VarChar(160)
+  imageAlt       String? @db.VarChar(200)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blog_posts")
+}
+
+// =====================
+// 部落格分類
+// =====================
+model BlogCategory {
+  id        Int    @id @default(autoincrement())
+  name      String @unique
+  sortOrder Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blog_categories")
+}
+
+// =====================
+// 全站內容與設定
+// =====================
+model SiteSettings {
+  id Int @id @default(1)
+
+  siteName          String
+  siteNameEn        String
+  logoUrl           String?
+  logoAlt           String?
+  footerDescription String  @db.Text
+  supportEmail      String
+  supportPhone      String
+  supportAddress    String? @db.Text
+  privacyPolicyUrl  String?
+  termsUrl          String?
+
+  facebookUrl  String?
+  instagramUrl String?
+  youtubeUrl   String?
+  lineUrl      String?
+
+  headerLinks        Json
+  footerSitemapLinks Json
+  footerSupportLinks Json
+
+  newsletterTitle       String
+  newsletterDescription String @db.Text
+  newsletterButtonText  String
+
+  homeHeroTitle       String
+  homeHeroSubtitle    String
+  homeHeroButtonText  String
+  homeHeroButtonLink  String
+  homeHeroImageUrl    String?
+  homeHeroImageAlt    String?
+  homeAboutEyebrow    String
+  homeAboutTitle      String
+  homeAboutDescription String @db.Text
+  homeAboutButtonText String
+  homeAboutButtonLink String
+  homeAboutImageUrl   String?
+  homeAboutImageAlt   String?
+  homeClassesEyebrow  String
+  homeClassesTitle    String
+  homeFeaturedClasses Json
+  homeShopEyebrow     String
+  homeShopTitle       String
+  homeShopCards       Json
+  homeNewsEyebrow     String
+  homeNewsTitle       String
+
+  aboutBannerEyebrow   String
+  aboutBannerTitle     String
+  aboutBannerImageUrl  String?
+  aboutBannerImageAlt  String?
+  aboutCoachImageUrl   String?
+  aboutCoachImageAlt   String?
+  aboutIntroBlocks     Json
+  aboutPrimaryButtonText String
+  aboutPrimaryButtonLink String
+  aboutPrinciples      Json
+  aboutSystemEyebrow   String
+  aboutSystemTitle     String
+  aboutSystemFeatures  Json
+  aboutSystemImageUrl  String?
+  aboutSystemImageAlt  String?
+  aboutExchangeTitle   String
+  aboutExchangeImages  Json
+  aboutExchangeText    String @db.Text
+  aboutFoundationTitle String
+  aboutFoundationImages Json
+  aboutFoundationText  String @db.Text
+  aboutModelEyebrow    String
+  aboutModelTitle      String
+  aboutModelImageUrl   String?
+  aboutModelImageAlt   String?
+
+  contactEyebrow        String
+  contactTitle          String
+  contactImageUrl       String?
+  contactImageAlt       String?
+  contactSuccessMessage String @db.Text
+  contactCategories     Json
+
+  classesBannerEyebrow String
+  classesBannerTitle   String
+  classesBannerImageUrl String?
+  classesBannerImageAlt String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+// =====================
+// 課程資料
+// =====================
+model Course {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique // URL 識別碼
+  titleEn     String
+  titleZh     String
+  subtitle    String?
+  intro       String   @db.Text
+  targets     String[] // 適合對象
+  modules     Json // 課程模組陣列 [{title, desc}]
+  bannerImage String?
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  // SEO 欄位
+  seoTitle       String? @db.VarChar(70)
+  seoDescription String? @db.VarChar(160)
+  imageAlt       String? @db.VarChar(200)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("courses")
+}

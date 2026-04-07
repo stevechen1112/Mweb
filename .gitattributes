@@ -1,0 +1,6 @@
+SVG/1[[:space:]]index.svg filter=lfs diff=lfs merge=lfs -text
+SVG/3[[:space:]]Class[[:space:]]list-1.svg filter=lfs diff=lfs merge=lfs -text
+SVG/4[[:space:]]Class[[:space:]]list-2.svg filter=lfs diff=lfs merge=lfs -text
+web/public/assets/1[[:space:]]index.svg filter=lfs diff=lfs merge=lfs -text
+web/public/assets/3[[:space:]]Class[[:space:]]list-1.svg filter=lfs diff=lfs merge=lfs -text
+web/public/assets/4[[:space:]]Class[[:space:]]list-2.svg filter=lfs diff=lfs merge=lfs -text
